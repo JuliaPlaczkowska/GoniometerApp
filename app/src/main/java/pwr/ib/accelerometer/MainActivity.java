@@ -34,6 +34,7 @@ import android.widget.Toast;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 
 import static android.view.View.VISIBLE;
 
@@ -55,8 +56,6 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
     private Button saveButton;
     private SurfaceView surfaceView;
     private double result;
-    //private SurfaceHolder mHolder;
-
 
     CustomDrawableView mCustomDrawableView = null;
     ShapeDrawable mDrawable = new ShapeDrawable();
@@ -96,7 +95,11 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
         Intent intent = new Intent(MainActivity.this, SaveResultActivity.class);
         Bundle b = new Bundle();
         b.putDouble("value", result);
-        b.putString("time", LocalDateTime.now().toString());
+
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+        String formatDateTime = LocalDateTime.now().format(formatter);
+
+        b.putString("time", formatDateTime);
         intent.putExtras(b);
         startActivity(intent);
         finish();
@@ -304,7 +307,6 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
 
             mDrawable = new ShapeDrawable(new RectShape());
             mDrawable.getPaint().setColor(0xff74AC23);
-            // mDrawable.setBounds(x, y, x + width, y + height);
 
         }
 
@@ -349,7 +351,7 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
             if (secondMeasurement) {
                 p.setColor(Color.BLACK);
                 p.setTextSize(45);
-                canvas.drawText((String.format("%,.2f", result) + " °"), viewWidth / 2 - 30, viewHeight / 2 - 30, p);
+                canvas.drawText((String.format("%,.2f", result) + " °"), viewWidth / 2 -50 , viewHeight / 2   , p);
             }
 
             if (finished) {
@@ -359,7 +361,7 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
                 canvas.drawRect(button, p);
                 p.setColor(Color.WHITE);
                 p.setTextSize(45);
-                canvas.drawText("SAVE", 100, 200, p);
+                canvas.drawText("SAVE", 100, 170, p);
             }
 
             invalidate();
