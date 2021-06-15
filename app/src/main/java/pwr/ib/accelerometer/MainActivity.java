@@ -53,8 +53,6 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
     private int rotX;
     private int rotY2;
     private int rotX2;
-    private Button saveButton;
-    private SurfaceView surfaceView;
     private double result;
 
     CustomDrawableView mCustomDrawableView = null;
@@ -70,6 +68,15 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
     private GestureDetectorCompat mDetector;
 
 
+    /**
+     * W momencie stworzenia aktywności inicjalizowany jest SensorManager dla urządzenia na którym
+     * działa aplikacja. SensorManager służy do pobrania informacji o wybranych czujnikach ( w naszym
+     * przypadku będzie to akcelerometr ) i zainicjalizowania metod nasłuchujących. Następnie
+     * utworzony jest CustomDrawableView, na którym będzie rysowany symulator gonimetru. Kolejnym
+     * krokiem jest utworzenie obiektu klasy  GestureDetectorCompat, który będzie nasłuchiwał
+     * wydarzeń kliknięcia na ekran za pomocą wbudowanych metod. Pozwoli także na odczytywanie
+     * takich informacji jak współrzędne kliknięcia
+     */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -90,6 +97,11 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
         mDetector = new GestureDetectorCompat(this, this);
     }
 
+    /**
+     * Funkcja przesyłająca wartość wykonanego pomiaru w stopniach wraz z datą i godziną wykonania
+     * do aktywności SaveResultActivity, gdzie, po podaniu nazwy pomiaru i zatwierdzeniu, zostanie
+     * zapisany do pliku tekstowego w poamięci urządzenia.
+     */
     @RequiresApi(api = Build.VERSION_CODES.O)
     public void saveResults() {
         Intent intent = new Intent(MainActivity.this, SaveResultActivity.class);
@@ -105,41 +117,35 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
         finish();
     }
 
+    /**
+     * Metoda nasłuchująca zmiany położenia urządzenia za pomocą wartości mierzonych przez sensor,
+     * czyli składowych sił działających na urządzenie (w pozycji nieruchomej jest to w przybliżeniu
+     * siła grawitacji) na kierunkach x, y i z. Celem aplikacji jest określenie kąta bocznej
+     * krawędzi telefonu. w tym celu aplikacja korzysta tylko z dwóch składowych -
+     * równologłych do ekranu urządzenia, czyli x i y, które są uaktualniane w tej metodzie
+     * i zapisywane do zmiennych globalnych.
+     * @param event
+     */
     @Override
     public void onSensorChanged(SensorEvent event) {
-
-        //Log.d(TAG, "onSensorChanged: X: " + event.values[0] + " Y: " + event.values[1] + " Z: " + event.values[2]);
-
         x = event.values[0];
         if (event.values[1] != 0)
             y = event.values[1];
         else
             y = 0.01;
-
-        if (surfaceView != null) {
-        }
     }
 
     @Override
     public void onAccuracyChanged(Sensor sensor, int accuracy) {
     }
 
+    /**
+     * Metoda nasłuchująca dotknięcia ekranu urządzenia
+     * @param e
+     * @return
+     */
     @Override
     public boolean onTouchEvent(MotionEvent e) {
-//        float x = e.getX();
-//        float y = e.getY();
-
-//        if (!finished) {
-//            if (secondMeasurement)
-//                finished = true;
-//            else {
-//                secondMeasurement = true;
-//                //Toast.makeText(this, "Click again to finish measurement", Toast.LENGTH_LONG).show();
-//            }
-//        } else {
-//            finished = false;
-//            secondMeasurement = false;
-//        }
         if (this.mDetector.onTouchEvent(e)) {
             return true;
         }
@@ -153,9 +159,25 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
 
     @Override
     public void onShowPress(MotionEvent e) {
-
     }
 
+
+    /**
+     * Metoda, nasłuchująca pojedyńczego kliknięcia w ekran. Gdy takie kliknięcie zostanie
+     * zarejestrowane, następuje zmodyfikowanie flag globalnych w celu określenia etapu pomiaru -
+     * pierwsze kliknięcie w ekran po uruchomieniu aktywności zapisuje pierwszą płaszczyzne, wówczas
+     * zostaje aktywowana flaga secondMeasurement, oznaczająca że drugi pomiar jest w toku. Kolejny
+     * klik zapisuje pomiar drugiej płaszczyzny i zostaje ustawiona flaga finished - czyli oba
+     * pomiary ukończone. W tym momencie użytkownik ma możliwość zapisania pomiaru poprzez
+     * kliknięcie na ekran w obszarze zielonego kwadratu z namisem SAVE - jego położenie jest
+     * określone za pomocą następującego warunku:
+     * (currX <= (buttonRight + 300) && currX >= buttonLeft && currY >= buttonTop && currY <= (buttonDown + 300))
+     * Jeżeli użytkownik kliknie w dowolnym miejscu niespełniającym tego warunku pomiar zostanie
+     * anulowany i nie będzie możliwości zapisania go do pliku. Wtedy aktywność wraca do stanu
+     * jak przy jej uruchomieniu.
+     * @param e - pojedyńcze kliknięcie na ekran
+     * @return
+     */
     @RequiresApi(api = Build.VERSION_CODES.O)
     @Override
     public boolean onSingleTapUp(MotionEvent e) {
@@ -168,7 +190,7 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
                 finished = true;
             } else {
                 secondMeasurement = true;
-                Toast.makeText(this, "Click again to finish measurement", Toast.LENGTH_LONG).show();
+                Toast.makeText(this, "Click again to finish measurement", Toast.LENGTH_SHORT).show();
             }
         } else {
 
@@ -197,95 +219,6 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
         return true;
     }
 
-//    @Override
-//    public void surfaceCreated(@NonNull SurfaceHolder holder) {
-//
-//    }
-//
-//    @Override
-//    public void surfaceChanged(@NonNull SurfaceHolder holder, int format, int width, int height) {
-//        viewHeight = height;
-//        viewWidth = width;
-//    }
-//
-//    @Override
-//    public void surfaceDestroyed(@NonNull SurfaceHolder holder) {
-//
-//    }
-//
-//
-//    private void tryDrawing(SurfaceHolder holder) {
-//        Log.i(TAG, "Trying to draw...");
-//
-//        Canvas canvas = holder.lockCanvas();
-//        mHolder = holder;
-//        if (canvas == null) {
-//            Log.e(TAG, "Cannot draw onto the canvas as it's null");
-//        } else {
-//            drawMyStuff(canvas);
-//            mHolder.unlockCanvasAndPost(canvas);
-//        }
-//    }
-//
-//    protected void onDraw(Canvas canvas) {
-//        canvas.drawRGB(255, 0, 255);
-//    }
-//
-//    private void drawMyStuff(Canvas canvas) {
-//
-//        int width = 150;
-//        int height = 150;
-//
-//        Log.i(TAG, "Drawing...");
-//        Paint p = new Paint(); // set some paint options
-//        p.setColor(Color.WHITE);
-//        p.setStrokeWidth(200);
-//        canvas.drawColor(Color.BLACK);
-//        rect = new RectF(viewWidth / 2 - width, viewHeight / 2 - height, viewWidth / 2 + width, viewHeight / 2 + height);
-//
-//        if (!finished) {
-//            if (secondMeasurement) {
-//                rotY2 = (int) (y / (Math.abs(x) + Math.abs(y)) * 10000);
-//                rotX2 = (int) (x / (Math.abs(x) + Math.abs(y)) * 10000);
-//
-//                canvas.drawLine(viewWidth / 2, viewHeight / 2, viewWidth / 2 + rotY2, viewHeight / 2 + rotX2, p);
-//            } else {
-//                rotY = (int) (y / (Math.abs(x) + Math.abs(y)) * 10000);
-//                rotX = (int) (x / (Math.abs(x) + Math.abs(y)) * 10000);
-//            }
-//
-//        } else {
-//            canvas.drawLine(viewWidth / 2, viewHeight / 2, viewWidth / 2 + rotY2, viewHeight / 2 + rotX2, p);
-//        }
-//
-//
-//        canvas.drawOval(rect, p);
-//        canvas.drawLine(viewWidth / 2, viewHeight / 2, viewWidth / 2 + rotY, viewHeight / 2 + rotX, p);
-//
-//
-//        if (rotX == 0)
-//            rotX = 1;
-//        if (rotX2 == 0)
-//            rotX2 = 1;
-//
-//        double c = Math.sqrt(Math.pow(rotX - rotX2, 2) + Math.pow(rotY - rotY2, 2));
-//        double a = Math.sqrt(Math.pow(rotX, 2) + Math.pow(rotY, 2));
-//        double b = Math.sqrt(Math.pow(rotX2, 2) + Math.pow(rotY2, 2));
-//        double result = Math.acos((a * a + b * b - c * c) / (2 * a * b)) * 360 / (Math.PI * 2);
-//
-//        if (secondMeasurement) {
-//            p.setColor(Color.BLACK);
-//            p.setTextSize(45);
-//            canvas.drawText((String.format("%,.2f", result) + " °"), viewWidth / 2 - 30, viewHeight / 2 - 30, p);
-//        }
-//
-//        if (finished) {
-//            saveButton.setVisibility(VISIBLE);
-//        }
-//
-//        mHolder.unlockCanvasAndPost(canvas);
-//    }
-
 
     public class CustomDrawableView extends View {
         static final int width = 150;
@@ -295,6 +228,13 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
         private int viewHeight;
 
 
+        /**
+         * Metoda pozwala pobrać wymiary ekranu i ustawia je jako zmienne globalne
+         * @param w
+         * @param h
+         * @param oldw
+         * @param oldh
+         */
         @Override
         protected void onSizeChanged(int w, int h, int oldw, int oldh) {
             super.onSizeChanged(w, h, oldw, oldh);
@@ -310,6 +250,13 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
 
         }
 
+        /**
+         * Metoda odpowiadająca za narysowanie symulacji goniometru i przycisku zatwierdzającego
+         * pomiar oraz oliczająca kąt między mierzonymi płaszczyznami. Zmienne rotX i rotY określają
+         * odległość punktu końcowego rysowanej białej linii od jej punktu początkowego na
+         * płaszczyźnie x i y. Analogicznie rotX2 i rotY2 dla lini drugiego pomiaru.
+         * @param canvas
+         */
         protected void onDraw(Canvas canvas) {
 
             Paint p = new Paint(); // set some paint options
@@ -319,6 +266,12 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
             rect = new RectF(viewWidth / 2 - width, viewHeight / 2 - height, viewWidth / 2 + width, viewHeight / 2 + height);
 
             if (!finished) {
+
+                /**
+                 * Jeśli jest wykonywany drugi pomiar, narysuj drugą "linijke", jeśli jest
+                 * wykonywany pierwszy pomiar, zmieniają się wartości rotX i rotY. Linia pierwszego
+                 * pomiaru jest rysowana zawsze, niezależnie od etapu pomiaru.
+                 */
                 if (secondMeasurement) {
                     rotY2 = (int) (y / (Math.abs(x) + Math.abs(y)) * 10000);
                     rotX2 = (int) (x / (Math.abs(x) + Math.abs(y)) * 10000);
@@ -343,19 +296,31 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
             if (rotX2 == 0)
                 rotX2 = 1;
 
+            /**
+             * Twierdzenie cosinusów dla trójkąta utworzonego pomiędzy mierzonymi płaszczyznami.
+             * Result jest wynikiem pomiaru kąta między narysowanymi liniami w stopniach.
+             */
             double c = Math.sqrt(Math.pow(rotX - rotX2, 2) + Math.pow(rotY - rotY2, 2));
             double a = Math.sqrt(Math.pow(rotX, 2) + Math.pow(rotY, 2));
             double b = Math.sqrt(Math.pow(rotX2, 2) + Math.pow(rotY2, 2));
             result = Math.acos((a * a + b * b - c * c) / (2 * a * b)) * 360 / (Math.PI * 2);
 
+            /**
+             * Jeśli użytkownik jest w trakcie wykonywania drugiego pomiaru aplikacja wyświetla na
+             * środku tymczasowy wynik pomiaru w stopniach
+             */
             if (secondMeasurement) {
                 p.setColor(Color.BLACK);
                 p.setTextSize(45);
                 canvas.drawText((String.format("%,.2f", result) + " °"), viewWidth / 2 -50 , viewHeight / 2   , p);
             }
 
+            /**
+             * Jeśli drugi pomiar został zakończony, jest rysowany zielony kwadrat z napisem "SAVE"
+             * umożliwiający zapis wykonanego pomiaru w plku tekstowym na telefonie. Ten wynik
+             * będzie można również w łatwy sposób odczytać za pomocą tej aplikacji.
+             */
             if (finished) {
-//                saveButton.setVisibility(VISIBLE);
                 RectF button = new RectF(buttonLeft, buttonTop, buttonRight, buttonDown);
                 p.setColor(Color.GREEN);
                 canvas.drawRect(button, p);

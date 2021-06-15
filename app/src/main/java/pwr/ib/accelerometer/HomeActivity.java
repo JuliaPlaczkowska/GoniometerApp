@@ -6,6 +6,10 @@ import android.view.View;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+/**
+ * Aktywność służąca jedynie do nawigacji do wykonania pomiaru lub wyświetlenia historii pomiarów za
+ * pomocą przycisków.
+ */
 public class HomeActivity extends AppCompatActivity {
 
     @Override

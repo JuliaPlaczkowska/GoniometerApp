@@ -25,7 +25,13 @@ public class HistoryActivity extends AppCompatActivity {
     private String TAG = "SAVE_TO_FILE_DEBUG";
 
 
+    /**
+     * nazwa folderu w którym zostanie zapisany plik tekstowy
+     */
     public static final String FOLDERNAME = "history";
+    /**
+     * nazwa pliku tekstowego
+     */
     public static final String FILENAME = "history_results.txt";
 
     @Override
@@ -38,7 +44,10 @@ public class HistoryActivity extends AppCompatActivity {
         File subFolder = new File(folder);
 
         String resource = " ";
-        //simple internal read
+
+        /**
+         * wszytaj dane z pliku o określonej ścieżce
+         */
         try (FileInputStream is = new FileInputStream(new File(subFolder, FILENAME))) {
             byte[] bytes = new byte[2048];
             is.read(bytes);
