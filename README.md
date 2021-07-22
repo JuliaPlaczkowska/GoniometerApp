@@ -28,20 +28,29 @@ Then open the project with Android Studio and run it on physical device.
 
 ## Instruction
 After running the project you will get the home activity: 
+
 ![Home view](https://i.imgur.com/CV7yCNV.png)
+
 Here you can choose whether you want to start a new measurement or view the history of your measurements.
 
 By clicking the MEASUREMENT button you will be redirected to the measurement activity:
+
 ![Measurement1](https://i.imgur.com/uFaUnyE.png)
+
 Screen above shows the initial appearance of the goniometer - before taking a measurement. When the initial plane is ready, tap anywhere on the screen and a second arm will appear as shown in the next figure.
+
 ![Measurement2](https://i.imgur.com/pZ3wLdX.png)
+
 After the phone is properly positioned along the second plane, click
 anywhere on the screen to stop the arms - then a green save button will appear (to opt out of saving the measurement click anywhere else). 
 After clicking save, we are transferred to the save-result view.
+
 ![Save screen](https://i.imgur.com/kdZOaZV.png)
+
 Here we can see the value of the measurement as well as the date and time in which the measurement was taken. Now you can
 enter the name of the measurement (e.g. name of the measured joint) and click the SUBMIT button. 
 Now you should see your measurement in measurements history:
+
 ![History](https://i.imgur.com/XaD75z0.png)
 
 ## Measurement
@@ -72,6 +81,3 @@ Confirm the second position by clicking on the screen
 ![Step4](https://i.imgur.com/BRN4Ey8.png)
 
 Save the measurement
-
-[Flashcards-UI]: <https://github.com/JuliaPlaczkowska/Flashcards_UI>
-[requests]: <https://github.com/JuliaPlaczkowska/Flashcards/blob/master/doc/examples/requests.txt>
